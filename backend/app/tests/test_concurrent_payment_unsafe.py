@@ -155,9 +155,8 @@ async def test_concurrent_payment_unsafe_demonstrates_race_condition(db_session,
     await engine.dispose()
 
 
-'''
 @pytest.mark.asyncio
-async def test_concurrent_payment_unsafe_both_succeed():
+async def test_concurrent_payment_unsafe_both_succeed(db_session, test_order):
     """
     Дополнительный тест: проверить, что ОБЕ транзакции успешно завершились.
     
@@ -194,14 +193,11 @@ async def test_concurrent_payment_unsafe_both_succeed():
 
     service = PaymentService(db_session)
     history = await service.get_payment_history(order_id)
-    paid_records = [r for r in history if r["status"] == "Paid"]
+    assert len(history) == 2, f"Обе транзакции Записали в историю. Записей: {len(history)}"
 
-    assert len(paid_records) == 2, f"Обе транзакции должны были записать 'Paid', записей: {len(paid_records)}"
-
-    print("✅ Both attempts succeeded — race condition confirmed (double payment, no errors).")
+    print("Обе транзакции сработали.")
 
     await engine.dispose()
-'''
 
 if __name__ == "__main__":
     """
